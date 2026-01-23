@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  ai-evaluator:
+    build: .
+    container_name: ai-evaluator
+    ports:
+      - "8001:8001"
+    environment:
+      - REDMINE_URL=${REDMINE_URL}
+      - REDMINE_USERNAME=${REDMINE_USERNAME}
+      - REDMINE_PASSWORD=${REDMINE_PASSWORD}
+      - REDMINE_API_KEY=${REDMINE_API_KEY}
+      - MCP_SERVER_URL=${MCP_SERVER_URL:-http://redmine-mcp-server:8000}
+      - MCP_USERNAME=${MCP_USERNAME}
+      - MCP_PASSWORD=${MCP_PASSWORD}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - EVALUATION_MODEL=${EVALUATION_MODEL:-claude-opus-4}
+      - MAX_TOKENS=${MAX_TOKENS:-4096}
+      - SERVICE_USERNAME=${SERVICE_USERNAME:-evaluator}
+      - SERVICE_PASSWORD=${SERVICE_PASSWORD:-changeme}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    networks:
+      - mnoc-ai-network
+
+networks:
+  mnoc-ai-network:
+    external: true
