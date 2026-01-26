@@ -23,31 +23,47 @@ Stores comprehensive evaluation results with:
 
 ## Setup
 
-### 1. Create Database (if needed)
-
-```sql
-CREATE DATABASE IF NOT EXISTS default;
-```
-
-### 2. Apply Schema
+### 1. Apply Schema (Docker Compose Setup)
 
 ```bash
-# From ClickHouse client
-clickhouse-client --host your-clickhouse-server --multiquery < clickhouse_schema.sql
+# From your ClickHouse server (e.g., mnoc-clickhouse1)
+# Navigate to the directory where you run docker compose
+cd /opt/mnoc-clickhouse
 
-# Or via HTTP
-cat clickhouse_schema.sql | curl 'http://your-clickhouse-server:8123/' --data-binary @-
+# Copy the schema file to your home directory if not already there
+# (You can also copy it from the ai-evaluator/schema directory)
+# cp /path/to/ai-evaluator/schema/clickhouse_schema.sql ~/clickhouse_schema.sql
+
+# Verify the schema file exists
+ls ~/clickhouse_schema.sql
+
+# Apply the schema (this will cleanup default database and create in mnoc_prod)
+cat ~/clickhouse_schema.sql | docker compose exec -T clickhouse-server clickhouse-client --multiquery
+
+# Alternative method (if the above doesn't work):
+# docker compose exec clickhouse-server clickhouse-client --multiquery < ~/clickhouse_schema.sql
 ```
 
-### 3. Verify Tables
+### 2. Verify Tables
 
-```sql
-SHOW TABLES FROM default;
+```bash
+# Enter ClickHouse client
+docker compose exec clickhouse-server clickhouse-client
+
+# Then run:
+SHOW TABLES FROM mnoc_prod;
 
 -- Should show:
 -- ai_evaluations
 -- ai_evaluations_daily_mv
 -- ai_evaluations_project_summary_mv
+
+# Check table structure
+DESCRIBE TABLE mnoc_prod.ai_evaluations;
+
+# Verify old tables are removed from default database
+SHOW TABLES FROM default;
+-- Should NOT show ai_evaluations tables
 ```
 
 ## Example Queries
@@ -62,7 +78,7 @@ SELECT
     automation_potential,
     automation_recommendations,
     evaluated_at
-FROM ai_evaluations
+FROM mnoc_prod.ai_evaluations
 WHERE automation_potential >= 8
 ORDER BY automation_potential DESC, evaluated_at DESC
 LIMIT 20;
@@ -77,7 +93,7 @@ SELECT
     avg(solution_quality) AS avg_quality,
     avg(automation_potential) AS avg_automation,
     count() AS total_issues
-FROM ai_evaluations
+FROM mnoc_prod.ai_evaluations
 WHERE evaluated_at >= now() - INTERVAL 30 DAY
 GROUP BY week, project_identifier
 ORDER BY week DESC, project_identifier;
@@ -94,7 +110,7 @@ SELECT
     adherence_to_solution,
     operator_effort,
     summary
-FROM ai_evaluations
+FROM mnoc_prod.ai_evaluations
 WHERE requires_attention = 1
 ORDER BY evaluated_at DESC
 LIMIT 50;
@@ -112,7 +128,7 @@ SELECT
     countIf(automation_candidate = 1) AS high_automation_count,
     countIf(requires_attention = 1) AS needs_attention_count,
     avg(resolution_time_seconds) / 3600 AS avg_resolution_hours
-FROM ai_evaluations
+FROM mnoc_prod.ai_evaluations
 WHERE evaluated_at >= now() - INTERVAL 90 DAY
 GROUP BY project_identifier
 ORDER BY total_evaluations DESC;
@@ -129,7 +145,7 @@ SELECT
     avg_solution_quality,
     avg_automation_potential,
     automation_candidates
-FROM ai_evaluations_daily_mv
+FROM mnoc_prod.ai_evaluations_daily_mv
 WHERE evaluation_date >= today() - 30
 ORDER BY evaluation_date DESC, project_identifier;
 ```
@@ -150,7 +166,7 @@ Create dashboards using these queries:
 - Adjust TTL if needed:
 
 ```sql
-ALTER TABLE ai_evaluations MODIFY TTL evaluated_at + INTERVAL 3 YEAR;
+ALTER TABLE mnoc_prod.ai_evaluations MODIFY TTL evaluated_at + INTERVAL 3 YEAR;
 ```
 
 ## Performance Tips
@@ -164,10 +180,10 @@ ALTER TABLE ai_evaluations MODIFY TTL evaluated_at + INTERVAL 3 YEAR;
 
 ```bash
 # Export data
-clickhouse-client --query="SELECT * FROM ai_evaluations FORMAT CSVWithNames" > evaluations_backup.csv
+docker compose exec clickhouse-server clickhouse-client --query="SELECT * FROM mnoc_prod.ai_evaluations FORMAT CSVWithNames" > evaluations_backup.csv
 
 # Import data
-cat evaluations_backup.csv | clickhouse-client --query="INSERT INTO ai_evaluations FORMAT CSVWithNames"
+cat evaluations_backup.csv | docker compose exec -T clickhouse-server clickhouse-client --query="INSERT INTO mnoc_prod.ai_evaluations FORMAT CSVWithNames"
 ```
 
 ## Monitoring
@@ -181,7 +197,7 @@ SELECT
     sum(rows) AS rows,
     max(modification_time) AS latest_modification
 FROM system.parts
-WHERE database = 'default' 
+WHERE database = 'mnoc_prod' 
   AND table LIKE 'ai_evaluations%'
 GROUP BY table
 ORDER BY table;

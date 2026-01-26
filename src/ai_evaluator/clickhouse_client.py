@@ -17,7 +17,7 @@ class ClickHouseClient:
         url: str,
         user: str,
         password: str,
-        database: str = "default"
+        database: str = "mnoc_prod"
     ):
         """
         Initialize ClickHouse client.
@@ -26,7 +26,7 @@ class ClickHouseClient:
             url: ClickHouse server URL (e.g., http://clickhouse:8123)
             user: Database user
             password: Database password
-            database: Database name (default: default)
+            database: Database name (default: mnoc_prod)
         """
         self.url = url.rstrip("/")
         self.user = user

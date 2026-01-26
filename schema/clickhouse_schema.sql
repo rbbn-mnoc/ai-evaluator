@@ -1,8 +1,16 @@
 -- ClickHouse Schema for AI Evaluation Results
 -- Optimized for analytics and time-series queries
 
+-- Clean up old tables from default database (if they exist)
+DROP TABLE IF EXISTS default.ai_evaluations_daily_mv;
+DROP TABLE IF EXISTS default.ai_evaluations_project_summary_mv;
+DROP TABLE IF EXISTS default.ai_evaluations;
+
+-- Create database
+CREATE DATABASE IF NOT EXISTS mnoc_prod;
+
 -- Main evaluation results table
-CREATE TABLE IF NOT EXISTS ai_evaluations (
+CREATE TABLE IF NOT EXISTS mnoc_prod.ai_evaluations (
     -- Primary identifiers
     evaluation_id UUID DEFAULT generateUUIDv4(),
     issue_id UInt32,
@@ -67,7 +75,7 @@ TTL evaluated_at + INTERVAL 2 YEAR
 SETTINGS index_granularity = 8192;
 
 -- Materialized view for daily aggregates
-CREATE MATERIALIZED VIEW IF NOT EXISTS ai_evaluations_daily_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mnoc_prod.ai_evaluations_daily_mv
 ENGINE = SummingMergeTree()
 PARTITION BY toYYYYMM(evaluation_date)
 ORDER BY (project_identifier, evaluation_date, issue_type)
@@ -85,11 +93,11 @@ AS SELECT
     countIf(automation_candidate = 1) AS automation_candidates,
     countIf(requires_attention = 1) AS requiring_attention,
     avg(resolution_time_seconds) AS avg_resolution_time
-FROM ai_evaluations
+FROM mnoc_prod.ai_evaluations
 GROUP BY evaluation_date, project_identifier, issue_type;
 
 -- Materialized view for project summaries
-CREATE MATERIALIZED VIEW IF NOT EXISTS ai_evaluations_project_summary_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS mnoc_prod.ai_evaluations_project_summary_mv
 ENGINE = SummingMergeTree()
 PARTITION BY toYYYYMM(month)
 ORDER BY (project_identifier, month)
@@ -103,18 +111,18 @@ AS SELECT
     countIf(automation_candidate = 1) AS high_automation_potential,
     countIf(improvement_priority = 'high') AS high_priority_improvements,
     topK(5)(class_id) AS top_issue_classes
-FROM ai_evaluations
+FROM mnoc_prod.ai_evaluations
 GROUP BY month, project_identifier;
 
 -- Index for faster filtering
-CREATE INDEX IF NOT EXISTS idx_automation_potential ON ai_evaluations (automation_potential) TYPE minmax GRANULARITY 4;
-CREATE INDEX IF NOT EXISTS idx_solution_quality ON ai_evaluations (solution_quality) TYPE minmax GRANULARITY 4;
+ALTER TABLE mnoc_prod.ai_evaluations ADD INDEX IF NOT EXISTS idx_automation_potential automation_potential TYPE minmax GRANULARITY 4;
+ALTER TABLE mnoc_prod.ai_evaluations ADD INDEX IF NOT EXISTS idx_solution_quality solution_quality TYPE minmax GRANULARITY 4;
 
 -- Example queries for analytics:
 
 -- Top automation candidates
 -- SELECT issue_id, project_identifier, subject, automation_potential, automation_recommendations
--- FROM ai_evaluations
+-- FROM mnoc_prod.ai_evaluations
 -- WHERE automation_potential >= 8
 -- ORDER BY automation_potential DESC, evaluated_at DESC
 -- LIMIT 20;
@@ -125,7 +133,7 @@ CREATE INDEX IF NOT EXISTS idx_solution_quality ON ai_evaluations (solution_qual
 --     project_identifier,
 --     avg(solution_quality) AS avg_quality,
 --     count() AS total_issues
--- FROM ai_evaluations
+-- FROM mnoc_prod.ai_evaluations
 -- GROUP BY week, project_identifier
 -- ORDER BY week DESC, project_identifier;
 
@@ -133,7 +141,7 @@ CREATE INDEX IF NOT EXISTS idx_solution_quality ON ai_evaluations (solution_qual
 -- SELECT issue_id, project_identifier, subject,
 --        solution_quality, adherence_to_solution, operator_effort,
 --        summary
--- FROM ai_evaluations
+-- FROM mnoc_prod.ai_evaluations
 -- WHERE requires_attention = 1
 -- ORDER BY evaluated_at DESC
 -- LIMIT 50;
