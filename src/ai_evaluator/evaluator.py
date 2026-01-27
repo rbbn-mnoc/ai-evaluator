@@ -4,7 +4,8 @@ import json
 import logging
 from datetime import datetime
 from typing import Optional
-from anthropic import AsyncAnthropic
+import boto3
+from strands.models import BedrockModel
 
 from .prompts import get_evaluation_prompt
 from .context_builder import ContextBuilder
@@ -23,8 +24,8 @@ class EvaluationAgent:
     def __init__(
         self,
         mcp_client,
-        anthropic_api_key: str,
-        model: str = "claude-opus-4",
+        bedrock_model_arn: str,
+        aws_region: str = "us-west-2",
         max_tokens: int = 4096
     ):
         """
@@ -32,14 +33,20 @@ class EvaluationAgent:
         
         Args:
             mcp_client: MCP client for fetching context
-            anthropic_api_key: Anthropic API key
-            model: Model to use for evaluation (default: claude-opus-4)
+            bedrock_model_arn: AWS Bedrock model ARN
+            aws_region: AWS region for Bedrock
             max_tokens: Maximum tokens for response
         """
         self.mcp = mcp_client
         self.context_builder = ContextBuilder(mcp_client)
-        self.anthropic = AsyncAnthropic(api_key=anthropic_api_key)
-        self.model = model
+        
+        # Initialize Bedrock model
+        session = boto3.Session(region_name=aws_region)
+        self.model = BedrockModel(
+            model_id=bedrock_model_arn,
+            boto_session=session
+        )
+        self.model_arn = bedrock_model_arn
         self.max_tokens = max_tokens
     
     async def evaluate_resolution(self, issue_data: dict) -> dict:
@@ -77,22 +84,27 @@ class EvaluationAgent:
                 zabbix_data=context.get("zabbix", {})
             )
             
-            # Call Claude Opus for evaluation
-            logger.info(f"Calling {self.model} for evaluation")
-            response = await self.anthropic.messages.create(
-                model=self.model,
-                max_tokens=self.max_tokens,
-                messages=[{
-                    "role": "user",
-                    "content": prompt
-                }]
+            # Call Bedrock for evaluation
+            logger.info(f"Calling Bedrock model {self.model_arn} for evaluation")
+            
+            # BedrockModel expects list of messages
+            messages = [
+                {"role": "user", "content": prompt}
+            ]
+            
+            # Invoke model synchronously (BedrockModel doesn't have async method)
+            import asyncio
+            response = await asyncio.to_thread(
+                self.model.invoke,
+                messages,
+                max_tokens=self.max_tokens
             )
             
             # Parse evaluation response
-            evaluation = self._parse_evaluation(response.content[0].text)
+            evaluation = self._parse_evaluation(response)
             evaluation["issue_id"] = issue_id
             evaluation["evaluated_at"] = datetime.utcnow().isoformat()
-            evaluation["model"] = self.model
+            evaluation["model"] = self.model_arn
             
             logger.info(
                 f"Evaluation complete for issue #{issue_id}: "

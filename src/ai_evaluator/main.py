@@ -37,8 +37,11 @@ security = HTTPBasic()
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://redmine-mcp-server:8000")
 MCP_USERNAME = os.getenv("MCP_USERNAME", "")
 MCP_PASSWORD = os.getenv("MCP_PASSWORD", "")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-EVALUATION_MODEL = os.getenv("EVALUATION_MODEL", "claude-opus-4")
+BEDROCK_MODEL_ARN = os.getenv(
+    "BEDROCK_MODEL_ARN",
+    "us.amazon.nova-pro-v1:0"  # Amazon Nova Pro for unbiased evaluation
+)
+AWS_REGION = os.getenv("AWS_REGION", "us-west-2")
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "4096"))
 
 # ClickHouse configuration
@@ -108,10 +111,8 @@ async def startup_event():
     global mcp_client, evaluation_agent, clickhouse_client
     
     logger.info("Starting AI Evaluator service...")
-    
-    if not ANTHROPIC_API_KEY:
-        logger.error("ANTHROPIC_API_KEY not set!")
-        raise RuntimeError("ANTHROPIC_API_KEY required")
+    logger.info(f"Using Bedrock model: {BEDROCK_MODEL_ARN}")
+    logger.info(f"AWS Region: {AWS_REGION}")
     
     # Initialize MCP client
     mcp_client = MCPClient(
@@ -136,8 +137,8 @@ async def startup_event():
     # Initialize evaluation agent
     evaluation_agent = EvaluationAgent(
         mcp_client=mcp_client,
-        anthropic_api_key=ANTHROPIC_API_KEY,
-        model=EVALUATION_MODEL,
+        bedrock_model_arn=BEDROCK_MODEL_ARN,
+        aws_region=AWS_REGION,
         max_tokens=MAX_TOKENS
     )
     
