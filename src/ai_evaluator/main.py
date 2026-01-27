@@ -63,6 +63,8 @@ clickhouse_client: ClickHouseClient = None
 
 class EvaluationRequest(BaseModel):
     """Request to evaluate an issue."""
+    model_config = {"extra": "ignore"}  # Ignore extra fields from redmine-event-source
+    
     issue_id: int
     project_id: int
     project_identifier: str
@@ -81,6 +83,10 @@ class EvaluationRequest(BaseModel):
     issue_resolve_in: str | None = None
     issue_resolve_by: str | None = None
     issue_resolve_at: str | None = None
+    collector_name: str | None = None  # Added field
+    trigger_name: str | None = None  # Added field
+    known_error_id: str | None = None  # Added field
+    zabbix_event_id: str | None = None  # Added field
 
 
 class EvaluationResponse(BaseModel):
@@ -161,6 +167,17 @@ async def shutdown_event():
     
     if clickhouse_client:
         await clickhouse_client.close()
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for container orchestration."""
+    return {
+        "status": "healthy",
+        "service": "ai-evaluator",
+        "model": BEDROCK_MODEL_ARN,
+        "clickhouse_enabled": CLICKHOUSE_ENABLED
+    }
 
 
 @app.get("/health")
