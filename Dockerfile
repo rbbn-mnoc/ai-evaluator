@@ -19,8 +19,8 @@ RUN uv pip install --system fastapi uvicorn
 # Create directory for any potential data
 RUN mkdir -p /app/data
 
-# Expose port
-EXPOSE 8001
+# Expose port (default 8002, but configurable via SERVER_PORT env var)
+EXPOSE 8002
 
-# Run the application
-CMD ["python", "-m", "uvicorn", "ai_evaluator.main:app", "--host", "0.0.0.0", "--port", "8001"]
+# Run the application using main.py which respects SERVER_HOST and SERVER_PORT env vars
+CMD ["python", "-m", "ai_evaluator.main"]
