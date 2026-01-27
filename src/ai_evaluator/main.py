@@ -142,7 +142,7 @@ async def startup_event():
         max_tokens=MAX_TOKENS
     )
     
-    logger.info(f"AI Evaluator initialized with model: {EVALUATION_MODEL}")
+    logger.info(f"AI Evaluator initialized with model: {BEDROCK_MODEL_ARN}")
     if CLICKHOUSE_ENABLED:
         logger.info(f"ClickHouse storage: ENABLED ({CLICKHOUSE_URL})")
     else:
