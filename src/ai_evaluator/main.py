@@ -126,6 +126,10 @@ async def startup_event():
         api_key=MCP_API_KEY
     )
     
+    # Start the MCP client session (critical!)
+    mcp_client.start()
+    logger.info("MCP client session started")
+    
     # Get MCP tools for the agent
     mcp_tools = await asyncio.to_thread(mcp_client.list_tools_sync)
     logger.info(f"Loaded {len(mcp_tools)} MCP tools for evaluation agent")
@@ -167,7 +171,8 @@ async def shutdown_event():
     logger.info("Shutting down AI Evaluator service...")
     
     if mcp_client:
-        await mcp_client.close()
+        mcp_client.close()
+        logger.info("MCP client closed")
     
     if clickhouse_client:
         await clickhouse_client.close()

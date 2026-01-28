@@ -36,6 +36,17 @@ class MCPClient:
         # Create Strands MCP client
         self._client = StrandsMCPClient(create_transport)
         
+    def start(self):
+        """Start the MCP client session."""
+        self._client.start()
+        
+    def close(self):
+        """Close the MCP client session."""
+        try:
+            self._client.close()
+        except:
+            pass
+    
     def list_tools_sync(self) -> list:
         """List available MCP tools synchronously."""
         return self._client.list_tools_sync()
