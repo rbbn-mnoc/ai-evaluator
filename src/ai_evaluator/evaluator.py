@@ -212,5 +212,3 @@ class EvaluationAgent:
         """
         logger.info(f"Stored evaluation for issue #{evaluation['issue_id']}")
         return True
-            logger.error(f"Failed to store evaluation for issue #{issue_id}: {e}")
-            return False
