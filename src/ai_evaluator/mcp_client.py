@@ -3,7 +3,8 @@
 import httpx
 import logging
 from typing import Any, Optional
-from fastmcp.client import streamablehttp_client, MCPClient as FastMCPClient
+from mcp.client.streamable_http import streamablehttp_client
+from strands.tools.mcp.mcp_client import MCPClient as StrandsMCPClient
 
 logger = logging.getLogger(__name__)
 
@@ -22,29 +23,22 @@ class MCPClient:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         
-        # Create streamable HTTP transport with authentication
-        if api_key:
-            headers = {"Authorization": f"Bearer {api_key}"}
-            logger.info("[mcp] MCP authentication enabled (using Authorization Bearer header)")
-            self.transport = streamablehttp_client(base_url, headers=headers)
-        else:
-            logger.warning("[mcp] MCP authentication disabled - no API key provided")
-            self.transport = streamablehttp_client(base_url)
+        # Create transport factory function (like ai-agents does)
+        def create_transport():
+            if api_key:
+                headers = {"Authorization": f"Bearer {api_key}"}
+                logger.info("[mcp] MCP authentication enabled (using Authorization Bearer header)")
+                return streamablehttp_client(base_url, headers=headers)
+            else:
+                logger.warning("[mcp] MCP authentication disabled - no API key provided")
+                return streamablehttp_client(base_url)
         
-        # Create FastMCP client
-        self._client = None
+        # Create Strands MCP client
+        self._client = StrandsMCPClient(create_transport)
         
-    def _get_client(self) -> FastMCPClient:
-        """Get or create MCP client instance."""
-        if self._client is None:
-            self._client = FastMCPClient(self.transport)
-        return self._client
-    
     def list_tools_sync(self) -> list:
         """List available MCP tools synchronously."""
-        client = self._get_client()
-        tools = client.list_tools()
-        return tools
+        return self._client.list_tools_sync()
         
     async def call_tool(self, tool_name: str, arguments: dict) -> dict:
         """
