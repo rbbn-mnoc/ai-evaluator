@@ -34,9 +34,8 @@ app = FastAPI(
 security = HTTPBasic()
 
 # Configuration
-MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://redmine-mcp-server:8000")
-MCP_USERNAME = os.getenv("MCP_USERNAME", "")
-MCP_PASSWORD = os.getenv("MCP_PASSWORD", "")
+MCP_BASE_URL = os.getenv("MCP_BASE_URL", "http://redmine-mcp-server:8000/mcp/")
+MCP_API_KEY = os.getenv("MCP_API_KEY", "")
 BEDROCK_MODEL_ARN = os.getenv(
     "BEDROCK_MODEL_ARN",
     "us.amazon.nova-pro-v1:0"  # Amazon Nova Pro for unbiased evaluation
@@ -119,13 +118,17 @@ async def startup_event():
     logger.info("Starting AI Evaluator service...")
     logger.info(f"Using Bedrock model: {BEDROCK_MODEL_ARN}")
     logger.info(f"AWS Region: {AWS_REGION}")
+    logger.info(f"MCP Server: {MCP_BASE_URL}")
     
     # Initialize MCP client
     mcp_client = MCPClient(
-        base_url=MCP_SERVER_URL,
-        username=MCP_USERNAME,
-        password=MCP_PASSWORD
+        base_url=MCP_BASE_URL,
+        api_key=MCP_API_KEY
     )
+    
+    # Get MCP tools for the agent
+    mcp_tools = await asyncio.to_thread(mcp_client.list_tools_sync)
+    logger.info(f"Loaded {len(mcp_tools)} MCP tools for evaluation agent")
     
     # Initialize ClickHouse client if configured
     if CLICKHOUSE_ENABLED:
@@ -140,12 +143,13 @@ async def startup_event():
     else:
         logger.warning("ClickHouse not configured - evaluations will only be stored in Redmine")
     
-    # Initialize evaluation agent
+    # Initialize evaluation agent with MCP tools
     evaluation_agent = EvaluationAgent(
         mcp_client=mcp_client,
         bedrock_model_arn=BEDROCK_MODEL_ARN,
         aws_region=AWS_REGION,
-        max_tokens=MAX_TOKENS
+        max_tokens=MAX_TOKENS,
+        mcp_tools=mcp_tools
     )
     
     logger.info(f"AI Evaluator initialized with model: {BEDROCK_MODEL_ARN}")

@@ -3,6 +3,7 @@
 import httpx
 import logging
 from typing import Any, Optional
+from fastmcp.client import streamablehttp_client, MCPClient as FastMCPClient
 
 logger = logging.getLogger(__name__)
 
@@ -10,18 +11,40 @@ logger = logging.getLogger(__name__)
 class MCPClient:
     """Client for communicating with Redmine MCP Server."""
     
-    def __init__(self, base_url: str, username: str, password: str):
+    def __init__(self, base_url: str, api_key: str = ""):
         """
         Initialize MCP client.
         
         Args:
-            base_url: MCP server base URL (e.g., http://redmine-mcp-server:8000)
-            username: Basic auth username
-            password: Basic auth password
+            base_url: MCP server base URL (e.g., http://172.31.33.44:8000/mcp/)
+            api_key: API key for Bearer token authentication
         """
         self.base_url = base_url.rstrip("/")
-        self.auth = (username, password)
-        self.client = httpx.AsyncClient(auth=self.auth, timeout=30.0)
+        self.api_key = api_key
+        
+        # Create streamable HTTP transport with authentication
+        if api_key:
+            headers = {"Authorization": f"Bearer {api_key}"}
+            logger.info("[mcp] MCP authentication enabled (using Authorization Bearer header)")
+            self.transport = streamablehttp_client(base_url, headers=headers)
+        else:
+            logger.warning("[mcp] MCP authentication disabled - no API key provided")
+            self.transport = streamablehttp_client(base_url)
+        
+        # Create FastMCP client
+        self._client = None
+        
+    def _get_client(self) -> FastMCPClient:
+        """Get or create MCP client instance."""
+        if self._client is None:
+            self._client = FastMCPClient(self.transport)
+        return self._client
+    
+    def list_tools_sync(self) -> list:
+        """List available MCP tools synchronously."""
+        client = self._get_client()
+        tools = client.list_tools()
+        return tools
         
     async def call_tool(self, tool_name: str, arguments: dict) -> dict:
         """

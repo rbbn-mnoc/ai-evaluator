@@ -4,8 +4,10 @@ import json
 import logging
 from datetime import datetime
 from typing import Optional
+import asyncio
 import boto3
 from strands.models import BedrockModel
+from strands import Agent
 
 from .prompts import get_evaluation_prompt
 from .context_builder import ContextBuilder
@@ -26,7 +28,8 @@ class EvaluationAgent:
         mcp_client,
         bedrock_model_arn: str,
         aws_region: str = "us-west-2",
-        max_tokens: int = 4096
+        max_tokens: int = 4096,
+        mcp_tools: list = None
     ):
         """
         Initialize evaluation agent.
@@ -36,16 +39,20 @@ class EvaluationAgent:
             bedrock_model_arn: AWS Bedrock model ARN
             aws_region: AWS region for Bedrock
             max_tokens: Maximum tokens for response
+            mcp_tools: List of MCP tools for the agent
         """
         self.mcp = mcp_client
         self.context_builder = ContextBuilder(mcp_client)
         
         # Initialize Bedrock model
         session = boto3.Session(region_name=aws_region)
-        self.model = BedrockModel(
+        bedrock_model = BedrockModel(
             model_id=bedrock_model_arn,
             boto_session=session
         )
+        
+        # Create Strands Agent with MCP tools (like ai-agents does)
+        self.agent = Agent(tools=mcp_tools or [], model=bedrock_model)
         self.model_arn = bedrock_model_arn
         self.max_tokens = max_tokens
     
@@ -84,20 +91,13 @@ class EvaluationAgent:
                 zabbix_data=context.get("zabbix", {})
             )
             
-            # Call Bedrock for evaluation
+            # Call Bedrock for evaluation using Strands Agent
             logger.info(f"Calling Bedrock model {self.model_arn} for evaluation")
             
-            # BedrockModel expects list of messages
-            messages = [
-                {"role": "user", "content": prompt}
-            ]
-            
-            # Invoke model synchronously (BedrockModel doesn't have async method)
-            import asyncio
-            response = await asyncio.to_thread(
-                self.model.invoke,
-                messages,
-                max_tokens=self.max_tokens
+            # Use Agent.invoke_async() like ai-agents does
+            response = await asyncio.wait_for(
+                self.agent.invoke_async(prompt),
+                timeout=300  # 5 minute timeout for evaluation
             )
             
             # Parse evaluation response
