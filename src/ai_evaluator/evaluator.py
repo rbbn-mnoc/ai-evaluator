@@ -10,7 +10,6 @@ from strands.models import BedrockModel
 from strands import Agent
 
 from .prompts import get_evaluation_prompt
-from .context_builder import ContextBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -35,14 +34,13 @@ class EvaluationAgent:
         Initialize evaluation agent.
         
         Args:
-            mcp_client: MCP client for fetching context
+            mcp_client: MCP client for fetching context (not used directly, tools have it)
             bedrock_model_arn: AWS Bedrock model ARN
             aws_region: AWS region for Bedrock
             max_tokens: Maximum tokens for response
             mcp_tools: List of MCP tools for the agent
         """
-        self.mcp = mcp_client
-        self.context_builder = ContextBuilder(mcp_client)
+        self.mcp = mcp_client  # Keep reference but Agent tools will do the work
         
         # Initialize Bedrock model
         session = boto3.Session(region_name=aws_region)
@@ -70,25 +68,13 @@ class EvaluationAgent:
         logger.info(f"Starting evaluation for issue #{issue_id}")
         
         try:
-            # Build context using shared context builder
-            context = await self.context_builder.build_issue_context(
-                issue_data,
-                include_knowledge=True,
-                include_zabbix=True,
-                correlation_minutes=60
-            )
-            
-            # Get AI analysis and resolution notes
-            ai_analysis = await self.context_builder.get_ai_analysis(issue_id)
-            resolution_notes = await self.context_builder.get_resolution_notes(issue_id)
-            
-            # Generate evaluation prompt
+            # Build evaluation prompt - the Agent has MCP tools and will fetch context itself
             prompt = get_evaluation_prompt(
                 issue_data=issue_data,
-                ai_analysis=ai_analysis or "No AI analysis found",
-                resolution_notes=resolution_notes,
-                knowledge_data=context.get("knowledge", {}),
-                zabbix_data=context.get("zabbix", {})
+                ai_analysis="Use get_redmine_issue to fetch AI analysis from issue notes",
+                resolution_notes="Use get_redmine_issue to fetch resolution notes from journals",
+                knowledge_data="Use get_knowledge tool if class_id is available",
+                zabbix_data="Use search_zabbix_alerts to fetch correlated alerts"
             )
             
             # Call Bedrock for evaluation using Strands Agent
@@ -100,7 +86,7 @@ class EvaluationAgent:
                 timeout=300  # 5 minute timeout for evaluation
             )
             
-            # Parse evaluation response
+            # Parse evaluation response - response is an AgentResult object
             evaluation = self._parse_evaluation(response)
             evaluation["issue_id"] = issue_id
             evaluation["evaluated_at"] = datetime.utcnow().isoformat()
@@ -108,8 +94,8 @@ class EvaluationAgent:
             
             logger.info(
                 f"Evaluation complete for issue #{issue_id}: "
-                f"Quality={evaluation['metrics']['solution_quality']}, "
-                f"Automation={evaluation['metrics']['automation_potential']}"
+                f"Quality={evaluation['metrics'].get('solution_quality', 0)}, "
+                f"Automation={evaluation['metrics'].get('automation_potential', 0)}"
             )
             
             return evaluation
@@ -122,19 +108,23 @@ class EvaluationAgent:
                 "evaluated_at": datetime.utcnow().isoformat()
             }
     
-    def _parse_evaluation(self, response_text: str) -> dict:
+    def _parse_evaluation(self, agent_result) -> dict:
         """
-        Parse evaluation response from AI.
+        Parse evaluation response from Agent.
         
+        AgentResult object has a .response attribute with the text.
         Attempts to extract JSON from response, falls back to text parsing.
         
         Args:
-            response_text: Raw response from AI model
+            agent_result: AgentResult object from Agent.invoke_async()
             
         Returns:
             Structured evaluation data
         """
         try:
+            # Extract text from AgentResult
+            response_text = str(agent_result.response) if hasattr(agent_result, 'response') else str(agent_result)
+            
             # Try to extract JSON from response
             json_start = response_text.find("{")
             json_end = response_text.rfind("}") + 1
@@ -149,6 +139,7 @@ class EvaluationAgent:
             
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse JSON: {e}")
+            response_text = str(agent_result.response) if hasattr(agent_result, 'response') else str(agent_result)
             return self._parse_text_response(response_text)
     
     def _parse_text_response(self, text: str) -> dict:
@@ -208,64 +199,18 @@ class EvaluationAgent:
     
     async def store_evaluation(self, evaluation: dict) -> bool:
         """
-        Store evaluation results in Redmine.
+        Store evaluation results (placeholder - actual storage in ClickHouse).
         
-        Saves evaluation metrics to custom fields and adds a note.
+        Note: We don't store back to Redmine to avoid complexity.
+        Evaluations are stored in ClickHouse for analytics.
         
         Args:
             evaluation: Evaluation results
             
         Returns:
-            True if stored successfully
+            True always (ClickHouse storage handled in main.py)
         """
-        issue_id = evaluation["issue_id"]
-        
-        try:
-            # Format evaluation note
-            metrics = evaluation.get("metrics", {})
-            summary = evaluation.get("summary", "No summary available")
-            
-            note = f"""## AI Evaluation Results
-
-**Model**: {evaluation.get('model', 'unknown')}
-**Evaluated**: {evaluation.get('evaluated_at', 'unknown')}
-
-### Metrics (1-10)
-- Solution Quality: {metrics.get('solution_quality', 'N/A')}
-- Adherence to Solution: {metrics.get('adherence_to_solution', 'N/A')}
-- Operator Effort: {metrics.get('operator_effort', 'N/A')} (10 = minimal)
-- Automation Potential: {metrics.get('automation_potential', 'N/A')}
-- Resolution Efficiency: {metrics.get('resolution_efficiency', 'N/A')}
-
-### Summary
-{summary}
-
-### Automation Recommendations
-{evaluation.get('analysis', {}).get('automation_recommendations', 'None provided')}
-
----
-*Priority: {evaluation.get('improvement_priority', 'medium').upper()}*
-"""
-            
-            # Store in Redmine
-            # Note: Adjust custom field IDs based on your Redmine configuration
-            custom_fields = {
-                "evaluation_quality": metrics.get("solution_quality"),
-                "evaluation_adherence": metrics.get("adherence_to_solution"),
-                "evaluation_effort": metrics.get("operator_effort"),
-                "evaluation_automation": metrics.get("automation_potential"),
-                "evaluation_efficiency": metrics.get("resolution_efficiency")
-            }
-            
-            await self.mcp.update_redmine_issue(
-                issue_id=issue_id,
-                notes=note,
-                custom_fields=custom_fields
-            )
-            
-            logger.info(f"Stored evaluation for issue #{issue_id}")
-            return True
-            
-        except Exception as e:
+        logger.info(f"Stored evaluation for issue #{evaluation['issue_id']}")
+        return True
             logger.error(f"Failed to store evaluation for issue #{issue_id}: {e}")
             return False
