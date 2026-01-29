@@ -189,16 +189,6 @@ async def health_check():
     }
 
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "ai-evaluator",
-        "model": EVALUATION_MODEL
-    }
-
-
 @app.post("/evaluate", response_model=EvaluationResponse)
 async def evaluate_issue(
     request: EvaluationRequest,
@@ -212,8 +202,8 @@ async def evaluate_issue(
     logger.info(f"Received evaluation request for issue #{request.issue_id} from {username}")
     
     try:
-        # Convert request to dict for evaluator
-        issue_data = request.dict()
+        # Convert request to dict for evaluator (Pydantic v2)
+        issue_data = request.model_dump()
         
         # Perform evaluation
         evaluation = await evaluation_agent.evaluate_resolution(issue_data)
