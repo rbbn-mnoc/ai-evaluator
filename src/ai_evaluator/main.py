@@ -137,15 +137,18 @@ async def startup_event():
     # Initialize ClickHouse client if configured
     if CLICKHOUSE_ENABLED:
         logger.info("Initializing ClickHouse client...")
+        logger.info(f"ClickHouse Configuration - URL: {CLICKHOUSE_URL}, User: {CLICKHOUSE_USER}, Database: {CLICKHOUSE_DATABASE}")
+        logger.info(f"ClickHouse Password present: {bool(CLICKHOUSE_PASSWORD)}, Length: {len(CLICKHOUSE_PASSWORD) if CLICKHOUSE_PASSWORD else 0}")
         clickhouse_client = ClickHouseClient(
             url=CLICKHOUSE_URL,
             user=CLICKHOUSE_USER,
             password=CLICKHOUSE_PASSWORD,
             database=CLICKHOUSE_DATABASE
         )
-        logger.info("ClickHouse client initialized")
+        logger.info("ClickHouse client initialized successfully")
     else:
         logger.warning("ClickHouse not configured - evaluations will only be stored in Redmine")
+        logger.warning(f"CLICKHOUSE_URL: {CLICKHOUSE_URL}, CLICKHOUSE_USER: {CLICKHOUSE_USER}")
     
     # Initialize evaluation agent with MCP tools
     evaluation_agent = EvaluationAgent(

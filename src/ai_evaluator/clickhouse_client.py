@@ -34,6 +34,9 @@ class ClickHouseClient:
         self.database = database
         self.client = httpx.AsyncClient(timeout=30.0)
         
+        logger.info(f"ClickHouseClient initialized with URL: {self.url}, User: {self.user}, Database: {self.database}")
+        logger.debug(f"ClickHouse password length: {len(self.password) if self.password else 0}")
+        
     async def execute(self, query: str, params: Optional[Dict] = None) -> Dict:
         """
         Execute a ClickHouse query.
@@ -46,19 +49,29 @@ class ClickHouseClient:
             Query result
         """
         try:
+            url = urljoin(self.url, "/")
+            request_params = {
+                "user": self.user,
+                "password": self.password,
+                "database": self.database
+            }
+            
+            logger.debug(f"ClickHouse request to {url}")
+            logger.debug(f"Request params - user: {request_params['user']}, database: {request_params['database']}, password_length: {len(request_params['password'])}")
+            
             response = await self.client.post(
-                urljoin(self.url, "/"),
-                params={
-                    "user": self.user,
-                    "password": self.password,
-                    "database": self.database
-                },
+                url,
+                params=request_params,
                 data=query.encode("utf-8")
             )
             response.raise_for_status()
             return {"success": True, "data": response.text}
         except httpx.HTTPError as e:
             logger.error(f"ClickHouse query failed: {e}")
+            logger.error(f"Request URL: {url}, User: {self.user}, Database: {self.database}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
             return {"success": False, "error": str(e)}
     
     async def store_evaluation(self, evaluation: Dict[str, Any], issue_data: Dict[str, Any]) -> bool:
@@ -194,13 +207,16 @@ class ClickHouseClient:
             )
             """
             
+            logger.info(f"Attempting to store evaluation for issue #{issue_data.get('issue_id')} to ClickHouse")
+            logger.debug(f"Using ClickHouse: URL={self.url}, User={self.user}, Database={self.database}")
+            
             result = await self.execute(query)
             
             if result.get("success"):
-                logger.info(f"Stored evaluation for issue #{issue_data.get('issue_id')} in ClickHouse")
+                logger.info(f"Successfully stored evaluation for issue #{issue_data.get('issue_id')} in ClickHouse")
                 return True
             else:
-                logger.error(f"Failed to store evaluation: {result.get('error')}")
+                logger.error(f"Failed to store evaluation for issue #{issue_data.get('issue_id')}: {result.get('error')}")
                 return False
                 
         except Exception as e:
