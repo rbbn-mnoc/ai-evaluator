@@ -156,10 +156,10 @@ Focus on actionable insights that can improve future resolutions.
     return prompt
 
 
-def _format_knowledge(knowledge_data: dict) -> str:
+def _format_knowledge(knowledge_data: dict | str) -> str:
     """Format knowledge data for prompt context."""
-    if not knowledge_data:
-        return "No historical knowledge available for this class."
+    if not knowledge_data or isinstance(knowledge_data, str):
+        return knowledge_data if isinstance(knowledge_data, str) else "No historical knowledge available for this class."
     
     total_occurrences = knowledge_data.get("total_occurrences", 0)
     last_seen = knowledge_data.get("last_seen", "unknown")
@@ -175,9 +175,12 @@ def _format_knowledge(knowledge_data: dict) -> str:
 """
 
 
-def _format_zabbix(zabbix_data: dict) -> str:
+def _format_zabbix(zabbix_data: dict | str) -> str:
     """Format Zabbix data for prompt context."""
-    if not zabbix_data or not zabbix_data.get("alerts"):
+    if not zabbix_data or isinstance(zabbix_data, str):
+        return zabbix_data if isinstance(zabbix_data, str) else "No Zabbix alerts in correlation window."
+    
+    if not zabbix_data.get("alerts"):
         return "No Zabbix alerts in correlation window."
     
     alerts = zabbix_data.get("alerts", [])
