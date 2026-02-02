@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml ./
 COPY README.md ./
 COPY src ./src
+COPY test_evaluation.py ./
 
 # Install dependencies
 RUN uv pip install --system -e .
