@@ -73,8 +73,8 @@ class EvaluationAgent:
                 issue_data=issue_data,
                 ai_analysis="Use get_redmine_issue to fetch AI analysis from issue notes",
                 resolution_notes="Use get_redmine_issue to fetch resolution notes from journals",
-                knowledge_data="Use get_knowledge tool if class_id is available",
-                zabbix_data="Use search_zabbix_alerts to fetch correlated alerts"
+                knowledge_data="Use get_knowledge_tool if class_id is available",
+                zabbix_data="Use get_zabbix_alerts to fetch correlated alerts"
             )
             
             # Call Bedrock for evaluation using Strands Agent
