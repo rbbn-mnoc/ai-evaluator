@@ -37,9 +37,7 @@ MCP_BASE_URL = os.getenv("MCP_BASE_URL", "http://redmine-mcp-server:8000/mcp/")
 MCP_API_KEY = os.getenv("MCP_API_KEY", "")
 BEDROCK_MODEL_ARN = os.getenv(
     "BEDROCK_MODEL_ARN",
-    # Use Claude Opus for unbiased evaluation (different from ai-agents' Sonnet)
-    # Nova Pro has compatibility issues with MCP tool result formatting
-    "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-opus-20240229-v1:0"
+    "us.amazon.nova-pro-v1:0"  # Amazon Nova Pro for unbiased evaluation
 )
 AWS_REGION = os.getenv("AWS_REGION", "us-west-2")
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "4096"))
