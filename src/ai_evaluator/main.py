@@ -3,6 +3,8 @@
 import os
 import asyncio
 import logging
+from contextlib import asynccontextmanager
+from asyncio import Queue
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -23,15 +25,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI app
-app = FastAPI(
-    title="MNOC AI Evaluator",
-    description="Post-resolution quality assessment service",
-    version="0.1.0"
-)
-
 # Basic auth for API endpoints
 security = HTTPBasic()
+
+# Initialize FastAPI app with lifespan (defined below)
+app = None  # Will be created after lifespan definition
 
 # Configuration
 MCP_BASE_URL = os.getenv("MCP_BASE_URL", "http://redmine-mcp-server:8000/mcp/")
@@ -58,6 +56,91 @@ SERVICE_PASSWORD = os.getenv("SERVICE_PASSWORD", "changeme")
 mcp_client: MCPClient = None
 evaluation_agent: EvaluationAgent = None
 clickhouse_client: ClickHouseClient = None
+evaluation_queue: Queue = None
+queue_worker_task = None
+
+
+class EvaluationQueue:
+    """Queue for managing concurrent evaluation requests."""
+    
+    def __init__(self):
+        self.queue = Queue()
+        self.worker_task = None
+        self.is_running = False
+    
+    async def start(self):
+        """Start the queue worker."""
+        self.is_running = True
+        self.worker_task = asyncio.create_task(self._worker())
+        logger.info("Evaluation queue worker started")
+    
+    async def stop(self):
+        """Stop the queue worker."""
+        self.is_running = False
+        if self.worker_task:
+            self.worker_task.cancel()
+            try:
+                await self.worker_task
+            except asyncio.CancelledError:
+                pass
+        logger.info("Evaluation queue worker stopped")
+    
+    async def _worker(self):
+        """Process evaluation requests from queue."""
+        while self.is_running:
+            try:
+                # Get next evaluation request from queue
+                issue_data, future = await self.queue.get()
+                
+                try:
+                    # Perform evaluation with retry logic
+                    evaluation = await self._evaluate_with_retry(issue_data)
+                    future.set_result(evaluation)
+                except Exception as e:
+                    logger.error(f"Evaluation failed for issue #{issue_data.get('issue_id')}: {e}")
+                    future.set_exception(e)
+                finally:
+                    self.queue.task_done()
+                    
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Queue worker error: {e}")
+    
+    async def _evaluate_with_retry(self, issue_data: dict, max_retries: int = 3) -> dict:
+        """Evaluate with exponential backoff retry on Bedrock failures."""
+        last_error = None
+        
+        for attempt in range(max_retries):
+            try:
+                return await evaluation_agent.evaluate_resolution(issue_data)
+            except Exception as e:
+                last_error = e
+                error_msg = str(e).lower()
+                
+                # Only retry on transient errors (network, timeout, stream errors)
+                if any(x in error_msg for x in ['timeout', 'connection', 'protocol', 'prematurely', 'network']):
+                    if attempt < max_retries - 1:
+                        wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
+                        logger.warning(f"Transient error on attempt {attempt + 1}/{max_retries}, retrying in {wait_time}s: {e}")
+                        await asyncio.sleep(wait_time)
+                        continue
+                
+                # Don't retry on other errors (permission, validation, etc.)
+                raise
+        
+        # All retries exhausted
+        raise last_error
+    
+    async def enqueue(self, issue_data: dict):
+        """Add evaluation request to queue and wait for result."""
+        future = asyncio.Future()
+        await self.queue.put((issue_data, future))
+        return await future
+    
+    def queue_size(self) -> int:
+        """Get current queue size."""
+        return self.queue.qsize()
 
 
 class EvaluationRequest(BaseModel):
@@ -110,10 +193,11 @@ def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
     return credentials.username
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize services on startup."""
-    global mcp_client, evaluation_agent, clickhouse_client
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager for startup and shutdown."""
+    # Startup
+    global mcp_client, evaluation_agent, clickhouse_client, evaluation_queue
     
     logger.info("Starting AI Evaluator service...")
     logger.info(f"Using Bedrock model: {BEDROCK_MODEL_ARN}")
@@ -164,14 +248,18 @@ async def startup_event():
         logger.info(f"ClickHouse storage: ENABLED ({CLICKHOUSE_URL})")
     else:
         logger.info("ClickHouse storage: DISABLED")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown."""
-    global mcp_client, clickhouse_client
     
+    # Initialize and start evaluation queue
+    evaluation_queue = EvaluationQueue()
+    await evaluation_queue.start()
+    
+    yield
+    
+    # Shutdown
     logger.info("Shutting down AI Evaluator service...")
+    
+    if evaluation_queue:
+        await evaluation_queue.stop()
     
     if mcp_client:
         mcp_client.close()
@@ -181,6 +269,15 @@ async def shutdown_event():
         await clickhouse_client.close()
 
 
+# Create FastAPI app with lifespan
+app = FastAPI(
+    title="MNOC AI Evaluator",
+    description="Post-resolution quality assessment service",
+    version="0.1.0",
+    lifespan=lifespan
+)
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint for container orchestration."""
@@ -188,7 +285,8 @@ async def health_check():
         "status": "healthy",
         "service": "ai-evaluator",
         "model": BEDROCK_MODEL_ARN,
-        "clickhouse_enabled": CLICKHOUSE_ENABLED
+        "clickhouse_enabled": CLICKHOUSE_ENABLED,
+        "queue_size": evaluation_queue.queue_size() if evaluation_queue else 0
     }
 
 
@@ -208,8 +306,9 @@ async def evaluate_issue(
         # Convert request to dict for evaluator (Pydantic v2)
         issue_data = request.model_dump()
         
-        # Perform evaluation
-        evaluation = await evaluation_agent.evaluate_resolution(issue_data)
+        # Queue evaluation (handles concurrency and retries)
+        logger.info(f"Queueing evaluation for issue #{request.issue_id} (queue size: {evaluation_queue.queue_size()})")
+        evaluation = await evaluation_queue.enqueue(issue_data)
         
         # Store results in Redmine
         stored_redmine = await evaluation_agent.store_evaluation(evaluation)

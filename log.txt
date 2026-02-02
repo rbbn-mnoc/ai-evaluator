@@ -1,0 +1,601 @@
+root@maas-prod-wkkelloggco-collector1:/var/snap/amazon-ssm-agent/12322# docker logs ai-evaluator | grep -v health
+/app/src/ai_evaluator/main.py:113: DeprecationWarning:
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+  @app.on_event("startup")
+/app/src/ai_evaluator/main.py:169: DeprecationWarning:
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+
+  @app.on_event("shutdown")
+2026-01-30 18:32:00,813 - __main__ - INFO - Starting AI Evaluator on 0.0.0.0:8002
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+2026-01-30 18:32:00,876 - ai_evaluator.main - INFO - Starting AI Evaluator service...
+2026-01-30 18:32:00,876 - ai_evaluator.main - INFO - Using Bedrock model: us.amazon.nova-pro-v1:0
+2026-01-30 18:32:00,876 - ai_evaluator.main - INFO - AWS Region: us-west-2
+2026-01-30 18:32:00,877 - ai_evaluator.main - INFO - MCP Server: http://172.31.33.44:8000/mcp/
+2026-01-30 18:32:00,878 - ai_evaluator.mcp_client - INFO - [mcp] MCP authentication enabled (using Authorization Bearer header)
+2026-01-30 18:32:01,030 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 18:32:01,036 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 18:32:01,036 - mcp.client.streamable_http - INFO - Received session ID: a3ed5629043e4b92a0caccbd5d7ce248
+2026-01-30 18:32:01,038 - mcp.client.streamable_http - INFO - Negotiated protocol version: 2025-06-18
+2026-01-30 18:32:01,039 - ai_evaluator.main - INFO - MCP client session started
+2026-01-30 18:32:01,055 - httpx - INFO - HTTP Request: GET http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 18:32:01,056 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 18:32:01,066 - httpx - INFO - HTTP Request: GET http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 18:32:01,067 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 202 Accepted"
+2026-01-30 18:32:01,072 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 18:32:01,080 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 18:32:01,096 - ai_evaluator.main - INFO - Loaded 18 MCP tools for evaluation agent
+2026-01-30 18:32:01,096 - ai_evaluator.main - INFO - Initializing ClickHouse client...
+2026-01-30 18:32:01,096 - ai_evaluator.main - INFO - ClickHouse Configuration - URL: http://172.31.159.42:8123, User: mnoc_prod_collector, Database: mnoc_prod
+2026-01-30 18:32:01,096 - ai_evaluator.main - INFO - ClickHouse Password present: True, Length: 16
+2026-01-30 18:32:01,107 - ai_evaluator.clickhouse_client - INFO - ClickHouseClient initialized with URL: http://172.31.159.42:8123, User: mnoc_prod_collector, Database: mnoc_prod
+2026-01-30 18:32:01,107 - ai_evaluator.main - INFO - ClickHouse client initialized successfully
+2026-01-30 18:32:01,139 - botocore.credentials - INFO - Found credentials from IAM Role: maas-prod-wkkelloggco-collector-role
+2026-01-30 18:32:01,244 - ai_evaluator.main - INFO - AI Evaluator initialized with model: us.amazon.nova-pro-v1:0
+2026-01-30 18:32:01,244 - ai_evaluator.main - INFO - ClickHouse storage: ENABLED (http://172.31.159.42:8123)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+2026-01-30 23:01:27,337 - ai_evaluator.main - INFO - Received evaluation request for issue #690066 from evaluator
+2026-01-30 23:01:27,337 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690066
+2026-01-30 23:01:27,337 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-01-30 23:01:27,339 - strands.telemetry.metrics - INFO - Creating Strands MetricsClient
+2026-01-30 23:01:30,748 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:01:30,750 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:01:30,752 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:01:30,755 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:01:30,758 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:01:30,765 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:01:31,615 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:01:31,617 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:01:47,369 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #690066: Quality=8, Automation=9
+2026-01-30 23:01:47,369 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690066
+2026-01-30 23:01:47,369 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #690066 to ClickHouse
+2026-01-30 23:01:47,378 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-01-30 23:01:47,381 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-01-30 23:01:47,381 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-01-30 23:01:47,381 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+2026-01-30 23:01:47,381 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-01-30 23:01:47,381 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #690066: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-01-30 23:01:59,227 - ai_evaluator.main - INFO - Received evaluation request for issue #690239 from evaluator
+2026-01-30 23:01:59,227 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690239
+2026-01-30 23:01:59,227 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-01-30 23:02:04,662 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:02:04,682 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:02:04,687 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:02:04,705 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:02:04,706 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:02:04,709 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:02:04,732 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:02:05,091 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:02:23,560 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #690239: Quality=9, Automation=8
+2026-01-30 23:02:23,560 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690239
+2026-01-30 23:02:23,560 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #690239 to ClickHouse
+2026-01-30 23:02:23,568 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-01-30 23:02:23,571 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-01-30 23:02:23,571 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-01-30 23:02:23,572 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+2026-01-30 23:02:23,573 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-01-30 23:02:23,573 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #690239: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-01-30 23:02:58,034 - ai_evaluator.main - INFO - Received evaluation request for issue #690397 from evaluator
+2026-01-30 23:02:58,035 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690397
+2026-01-30 23:02:58,035 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-01-30 23:03:05,747 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:03:05,749 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:03:05,750 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:03:05,753 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-30 23:03:05,755 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:03:05,757 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:03:05,767 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:03:06,057 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-30 23:03:26,974 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #690397: Quality=9, Automation=8
+2026-01-30 23:03:26,974 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690397
+2026-01-30 23:03:26,974 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #690397 to ClickHouse
+2026-01-30 23:03:26,985 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-01-30 23:03:26,987 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-01-30 23:03:26,987 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-01-30 23:03:26,987 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+thinking>
+
+Tool #1: get_redmine_issue
+
+Tool #2: get_knowledge_tool
+
+Tool #3: search_knowledge_base
+
+Tool #4: search_redmine_issues
+{
+    "issue_id": 690066,
+    "evaluated_at": "2026-01-30T15:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 8,
+        "adherence_to_solution": 7,
+        "operator_effort": 6,
+        "automation_potential": 9,
+        "resolution_efficiency": 7
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, identifying the root cause correctly and recommending appropriate actions. It effectively leveraged historical knowledge.",
+        "adherence_notes": "The operator followed the suggested troubleshooting steps but deviated by manually verifying the resolution. The deviation was justified as the issue did not clear automatically as expected.",
+        "operator_effort_notes": "The operator needed to perform manual verification and closure, indicating moderate effort. The resolution was not straightforward due to the issue not clearing automatically.",
+        "automation_recommendations": "Automation could be improved by enhancing the auto-clearing mechanism and integrating it with the monitoring system to handle similar issues more effectively.",
+        "efficiency_notes": "The issue was resolved in a reasonable time, but there is room for improvement in the efficiency of the process, especially in handling similar issues that do not clearautomatically."
+    },
+    "summary": "The resolution process showed good adherence to the AI's recommendations and effective use of historical knowledge. However, the manual effort required and the deviation from expected auto-clearing indicate areas for improvement in automation and efficiency. Enhancing the auto-clearing mechanism and integrating it with the monitoring system presents the most impactful automation opportunity.",
+    "improvement_priority": "medium"
+<thinking> To provide a comprehensive evaluation, I need to gather detailed information about the issue, its resolution, and the context around it. I will start by fetching the AI analysis and resolution notes from the Redmine issue. Then, I will use the get_knowledge_tool to retrieve historical knowledge about the issue class. Additionally, I will search for correlated alerts in Zabbix to understand the context better. </thinking>
+Tool #5: get_redmine_issue
+
+Tool #6: get_knowledge_tool
+
+Tool #7: search_knowledge_base
+
+Tool #8: search_redmine_issues
+{
+    "issue_id": 690239,
+    "evaluated_at": "2026-01-30T15:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 9,
+        "adherence_to_solution": 8,
+        "operator_effort": 7,
+        "automation_potential": 8,
+        "resolution_efficiency": 8
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, correctly identifying the root cause and recommending appropriate actions. It effectively leveraged historical knowledge.",
+        "adherence_notes": "The operator followed the suggested troubleshooting steps and adhered to the recommended procedure. The resolution was manual, as expected for this type of issue.",
+        "operator_effort_notes": "The operator needed to verify the self-recovery and manually clear the alarm, indicating moderate effort. The resolution was straightforward due to the establishedprocedure.",
+        "automation_recommendations": "Automation could be improved by integrating a script to automatically verify the next scheduled execution and clear the alarm if successful. This would reduceoperator effort and improve efficiency.",
+        "efficiency_notes": "The issue was resolved in a reasonable time, and resources were used effectively. The process could be further optimized by automating the verification and clearing steps."
+    },
+    "summary": "The resolution process demonstrated good adherence to the AI's recommendations and effective use of historical knowledge. The operator's effort was moderate, and the process was efficient. The most impactful automation opportunity lies in automating the verification and clearing steps for similar issues.",
+    "improvement_priority": "medium"
+2026-01-30 23:03:26,988 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-01-30 23:03:26,989 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #690397: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+<thinking> To provide a comprehensive evaluation, I need to gather detailed information about the issue, its resolution, and the context around it. I will start by fetching the AI analysis and resolution notes from the Redmine issue. Then, I will use the get_knowledge_tool to retrieve historical knowledge about the issue class. Additionally, I will search for correlated alerts in Zabbix to understand the context better. </thinking>
+Tool #9: get_redmine_issue
+
+Tool #10: get_knowledge_tool
+
+Tool #11: search_knowledge_base
+
+Tool #12: search_redmine_issues
+{
+    "issue_id": 690397,
+    "evaluated_at": "2026-01-30T15:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 9,
+        "adherence_to_solution": 8,
+        "operator_effort": 7,
+        "automation_potential": 8,
+        "resolution_efficiency": 8
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, correctly identifying the root cause and recommending appropriate actions. It effectively leveraged historical knowledge.",
+        "adherence_notes": "The operator followed the suggested troubleshooting steps and adhered to the recommended procedure. The resolution was manual, as expected for this type of issue.",
+        "operator_effort_notes": "The operator needed to verify the user account status and authentication configuration, indicating moderate effort. The resolution was straightforward due to the established procedure.",
+        "automation_recommendations": "Automation could be improved by integrating a script to automatically verify the user account status and authentication configuration, and clear the alarm if the issue is resolved. This would reduce operator effort and improve efficiency.",
+        "efficiency_notes": "The issue was resolved in a reasonable time, and resources were used effectively. The process could be further optimized by automating the verification and clearing steps for similar issues."
+    },
+    "summary": "The resolution process demonstrated good adherence to the AI's recommendations and effective use of historical knowledge. The operator's effort was moderate, and the process was efficient. The most impactful automation opportunity lies in automating the verification and clearing steps for similar issues.",
+    "improvement_priority": "medium"
+2026-01-31 23:01:21,508 - ai_evaluator.main - INFO - Received evaluation request for issue #689917 from evaluator
+2026-01-31 23:01:21,508 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #689917
+2026-01-31 23:01:21,508 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-01-31 23:01:32,123 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-31 23:01:32,125 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-31 23:01:32,126 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-31 23:01:32,129 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-01-31 23:01:32,132 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-31 23:01:32,136 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-31 23:01:32,137 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-31 23:01:32,139 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-01-31 23:01:42,350 - strands.event_loop.event_loop - ERROR - cycle failed
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/event_loop.py", line 192, in event_loop_cycle
+    async for tool_event in tool_events:
+        yield tool_event
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/event_loop.py", line 535, in _handle_tool_execution
+    async for event in events:
+        yield event
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/event_loop.py", line 269, in recurse_event_loop
+    async for event in events:
+        yield event
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/event_loop.py", line 155, in event_loop_cycle
+    async for model_event in model_events:
+        if not isinstance(model_event, ModelStopReason):
+            yield model_event
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/event_loop.py", line 400, in _handle_model_execution
+    raise e
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/event_loop.py", line 331, in _handle_model_execution
+    async for event in stream_messages(
+    ...<8 lines>...
+        yield event
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/streaming.py", line 462, in stream_messages
+    async for event in process_stream(chunks, start_time):
+        yield event
+  File "/usr/local/lib/python3.13/site-packages/strands/event_loop/streaming.py", line 393, in process_stream
+    async for chunk in chunks:
+    ...<22 lines>...
+            handle_redact_content(chunk["redactContent"], state)
+  File "/usr/local/lib/python3.13/site-packages/strands/models/bedrock.py", line 731, in stream
+    await task
+  File "/usr/local/lib/python3.13/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.13/site-packages/opentelemetry/instrumentation/threading/__init__.py", line 171, in wrapped_func
+    return original_func(*func_args, **func_kwargs)
+  File "/usr/local/lib/python3.13/site-packages/strands/models/bedrock.py", line 770, in _stream
+    for chunk in response["stream"]:
+                 ~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/botocore/eventstream.py", line 591, in __iter__
+    for event in self._event_generator:
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/botocore/eventstream.py", line 598, in _create_raw_event_generator
+    for chunk in self._raw_stream.stream():
+                 ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/urllib3/response.py", line 1250, in stream
+    yield from self.read_chunked(amt, decode_content=decode_content)
+  File "/usr/local/lib/python3.13/site-packages/urllib3/response.py", line 1418, in read_chunked
+    self._update_chunk_length()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/urllib3/response.py", line 1344, in _update_chunk_length
+    raise ProtocolError("Response ended prematurely") from None
+urllib3.exceptions.ProtocolError: Response ended prematurely
+2026-01-31 23:01:42,357 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #689917: Response ended prematurely
+2026-01-31 23:01:42,357 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #689917
+<thinking> To provide a comprehensive evaluation, I need to gather detailed information about the issue, its resolution, and the context around it. I will start by fetching the AI analysis and resolution notes from the Redmine issue. Then, I will use the get_knowledge_tool to retrieve historical knowledge about the issue class. Additionally, I will search for correlated alerts in Zabbix to understand the context better. </thinking>
+Tool #13: get_redmine_issue
+
+Tool #14: get_knowledge_tool
+
+Tool #15: search_knowledge_base
+
+Tool #16: search_redmine_issues
+2026-02-01 22:05:21,670 - ai_evaluator.main - INFO - Received evaluation request for issue #691279 from evaluator
+2026-02-01 22:05:21,671 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #691279
+2026-02-01 22:05:21,671 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 22:05:37,303 - ai_evaluator.main - INFO - Received evaluation request for issue #691278 from evaluator
+2026-02-01 22:05:37,303 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #691278
+2026-02-01 22:05:37,303 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 22:05:37,303 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #691278: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 22:05:37,303 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #691278
+{
+    "issue_id": 689917,
+    "evaluated_at": "2026-01-31T15:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 9,
+        "adherence_to_solution": 8,
+        "operator_effort": 7,
+        "automation_potential": 8,
+        "resolution_efficiency": 8
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, correctly identifying the root cause and recommending appropriate actions. It effectively leveraged historical knowledge.",
+        "adherence_notes": "The operator followed the suggested troubleshooting steps and adhered to the recommended procedure. The resolution was manual, as expected for this type of issue.",
+        "operator_effort_notes": "The operator needed to verify the redundancy status and clear the alarm, indicating moderate effort. The resolution was straightforward due to the established procedure.",
+        "automation_recommendations": "Automation could be improved by integrating a script to automatically verify the redundancy status and clear the alarm if the issue is resolved. This would reduce operator effort and improve efficiency.",
+        "efficiency_notes": "The issue was resolved in a reasonable time, and resources were used effectively. The process could be further optimized by automating the verification and clearing steps for similar issues."
+    },
+    "summary": "The resolution process demonstrated good adherence to the AI's recommendations and effective use of historical knowledge. The operator's effort was moderate, and the process was efficient. The most impactful automation opportunity lies in automating the verification and clearing steps for similar issues.",
+    "improvementINFO:     172.31.33.44:37798 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 22:05:37,470 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #691279: Quality=9, Automation=8
+2026-02-01 22:05:37,470 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #691279
+2026-02-01 22:05:37,470 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #691279 to ClickHouse
+2026-02-01 22:05:37,477 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-02-01 22:05:37,478 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-02-01 22:05:37,478 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-02-01 22:05:37,479 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+2026-02-01 22:05:37,479 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-02-01 22:05:37,479 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #691279: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-02-01 22:05:37,918 - ai_evaluator.main - INFO - Received evaluation request for issue #691277 from evaluator
+2026-02-01 22:05:37,918 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #691277
+2026-02-01 22:05:37,919 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+_priority": "medium"
+2026-02-01 22:05:50,359 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 22:05:50,361 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 22:05:50,362 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 22:05:50,365 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 22:05:50,369 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 22:05:50,373 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 22:05:50,377 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 22:05:51,111 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 22:06:15,739 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #691277: Quality=9, Automation=10
+2026-02-01 22:06:15,740 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #691277
+2026-02-01 22:06:15,740 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #691277 to ClickHouse
+2026-02-01 22:06:15,747 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-02-01 22:06:15,749 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-02-01 22:06:15,750 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-02-01 22:06:15,751 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+2026-02-01 22:06:15,751 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-02-01 22:06:15,751 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #691277: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+thinking>
+Tool #17: get_redmine_issue
+
+Tool #18: get_knowledge_tool
+
+Tool #19: search_knowledge_base
+
+Tool #20: search_redmine_issues
+{
+    "issue_id": 691277,
+    "evaluated_at": "2026-02-01T22:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 9,
+        "adherence_to_solution": 10,
+        "operator_effort": 10,
+        "automation_potential": 10,
+        "resolution_efficiency": 10
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, correctly identifying the issue as a transient ICMP failure. It leveraged historical knowledge effectively, noting the established pattern of automatic resolution.",
+        "adherence_notes": "The operator followed the AI's recommendation precisely, as the issue was automatically resolved without any manual intervention.",
+        "operator_effort_notes": "Minimal effort was required from the operator, as the issue resolved itself automatically within 1 minute.",
+        "automation_recommendations": "This issue demonstrates high potential for automation, as it has consistently resolved itself automatically. Further automation could involve monitoring for similar patterns and alerting only if the resolution time exceeds a certain threshold.",
+        "efficiency_notes": "The resolution was highly efficient, as the issue cleared automatically within the expected time frame, and no additional resources were needed."
+    },
+    "summary": "The resolution process for this issue was highly efficient and required minimal operator effort. The AI's recommendation was accurate and relevant, and the issue resolved itself automatically. The most impactful automation opportunity would be to monitor for similar patterns and alert only if the resolution time exceeds a certain threshold.",
+    "improvement_priority": "low"
+2026-02-01 23:03:17,960 - ai_evaluator.main - INFO - Received evaluation request for issue #690776 from evaluator
+2026-02-01 23:03:17,961 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690776
+2026-02-01 23:03:17,961 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:32,149 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:03:32,150 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:03:32,154 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:03:32,155 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:03:32,161 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:03:32,165 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:03:32,171 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:03:33,590 - ai_evaluator.main - INFO - Received evaluation request for issue #690775 from evaluator
+2026-02-01 23:03:33,591 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690775
+2026-02-01 23:03:33,591 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:33,591 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690775: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:33,591 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690775
+<thinking> To provide a comprehensive evaluation, I need to gather detailed information about the issue, its resolution, and the context around it. I will start by fetching the AI analysis and resolution notes from the Redmine issue. Then, I will use the get_knowledge_tool to retrieve historical knowledge about the issue class. Additionally, I will search for correlated alerts in Zabbix to understand the context better. </thinking>
+Tool #21: get_redmine_issue
+
+Tool #22: get_knowledge_tool
+
+Tool #23: search_knowledge_base
+
+Tool #24: search_redmine_issues
+INFO:     172.31.33.44:39062 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:34,208 - ai_evaluator.main - INFO - Received evaluation request for issue #690774 from evaluator
+2026-02-01 23:03:34,208 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690774
+2026-02-01 23:03:34,208 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:34,208 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690774: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:34,208 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690774
+INFO:     172.31.33.44:39076 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:39092 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:34,837 - ai_evaluator.main - INFO - Received evaluation request for issue #690773 from evaluator
+2026-02-01 23:03:34,837 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690773
+2026-02-01 23:03:34,837 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:34,837 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690773: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:34,837 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690773
+2026-02-01 23:03:35,458 - ai_evaluator.main - INFO - Received evaluation request for issue #690772 from evaluator
+2026-02-01 23:03:35,458 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690772
+2026-02-01 23:03:35,458 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:35,459 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690772: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:35,459 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690772
+INFO:     172.31.33.44:39106 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:36,079 - ai_evaluator.main - INFO - Received evaluation request for issue #690771 from evaluator
+2026-02-01 23:03:36,079 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690771
+2026-02-01 23:03:36,080 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:36,080 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690771: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:36,080 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690771
+INFO:     172.31.33.44:39112 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:36,697 - ai_evaluator.main - INFO - Received evaluation request for issue #690770 from evaluator
+2026-02-01 23:03:36,697 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690770
+2026-02-01 23:03:36,697 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:36,697 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690770: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:36,698 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690770
+INFO:     172.31.33.44:39128 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:37,325 - ai_evaluator.main - INFO - Received evaluation request for issue #690769 from evaluator
+2026-02-01 23:03:37,326 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690769
+INFO:     172.31.33.44:39142 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:37,326 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:37,326 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690769: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:37,326 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690769
+2026-02-01 23:03:37,941 - ai_evaluator.main - INFO - Received evaluation request for issue #690768 from evaluator
+2026-02-01 23:03:37,942 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690768
+2026-02-01 23:03:37,942 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:37,942 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690768: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:37,942 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690768
+INFO:     172.31.33.44:39158 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:39174 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:38,558 - ai_evaluator.main - INFO - Received evaluation request for issue #690767 from evaluator
+2026-02-01 23:03:38,558 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690767
+2026-02-01 23:03:38,559 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:38,559 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690767: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:38,559 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690767
+2026-02-01 23:03:39,176 - ai_evaluator.main - INFO - Received evaluation request for issue #690766 from evaluator
+2026-02-01 23:03:39,176 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690766
+2026-02-01 23:03:39,177 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:39,177 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690766: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:39,177 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690766
+INFO:     172.31.33.44:39176 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:39,573 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:03:39,797 - ai_evaluator.main - INFO - Received evaluation request for issue #690765 from evaluator
+2026-02-01 23:03:39,798 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690765
+2026-02-01 23:03:39,798 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:39,798 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690765: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:39,798 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690765
+INFO:     172.31.33.44:39188 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:40,884 - ai_evaluator.main - INFO - Received evaluation request for issue #690764 from evaluator
+2026-02-01 23:03:40,884 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690764
+2026-02-01 23:03:40,884 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:40,884 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690764: Agent is already processing a request. Concurrent invocations are not supported.
+INFO:     172.31.33.44:39198 - "POST /evaluate HTTP/1.1" 200 OK
+2026-02-01 23:03:40,884 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690764
+2026-02-01 23:03:41,499 - ai_evaluator.main - INFO - Received evaluation request for issue #690763 from evaluator
+2026-02-01 23:03:41,500 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690763
+2026-02-01 23:03:41,500 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:41,501 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690763: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:41,501 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690763
+2026-02-01 23:03:42,121 - ai_evaluator.main - INFO - Received evaluation request for issue #690762 from evaluator
+2026-02-01 23:03:42,122 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690762
+2026-02-01 23:03:42,122 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:42,123 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690762: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:42,123 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690762
+2026-02-01 23:03:42,779 - ai_evaluator.main - INFO - Received evaluation request for issue #690761 from evaluator
+2026-02-01 23:03:42,780 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690761
+2026-02-01 23:03:42,780 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:42,780 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690761: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:42,780 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690761
+2026-02-01 23:03:43,396 - ai_evaluator.main - INFO - Received evaluation request for issue #690760 from evaluator
+2026-02-01 23:03:43,397 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690760
+2026-02-01 23:03:43,397 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:43,397 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690760: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:43,397 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690760
+2026-02-01 23:03:44,012 - ai_evaluator.main - INFO - Received evaluation request for issue #690759 from evaluator
+2026-02-01 23:03:44,012 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690759
+2026-02-01 23:03:44,012 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:44,012 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690759: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:44,012 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690759
+2026-02-01 23:03:44,628 - ai_evaluator.main - INFO - Received evaluation request for issue #690758 from evaluator
+2026-02-01 23:03:44,628 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690758
+2026-02-01 23:03:44,628 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:44,628 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690758: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:44,629 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690758
+2026-02-01 23:03:45,248 - ai_evaluator.main - INFO - Received evaluation request for issue #690757 from evaluator
+2026-02-01 23:03:45,248 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690757
+2026-02-01 23:03:45,248 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:45,249 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690757: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:45,249 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690757
+2026-02-01 23:03:45,907 - ai_evaluator.main - INFO - Received evaluation request for issue #690777 from evaluator
+2026-02-01 23:03:45,907 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690777
+2026-02-01 23:03:45,908 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:45,908 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690777: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:45,908 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690777
+2026-02-01 23:03:46,521 - ai_evaluator.main - INFO - Received evaluation request for issue #690786 from evaluator
+2026-02-01 23:03:46,521 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690786
+2026-02-01 23:03:46,522 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:46,522 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690786: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:46,522 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690786
+2026-02-01 23:03:54,017 - ai_evaluator.main - INFO - Received evaluation request for issue #690860 from evaluator
+2026-02-01 23:03:54,017 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690860
+2026-02-01 23:03:54,018 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:03:54,018 - ai_evaluator.evaluator - ERROR - Evaluation failed for issue #690860: Agent is already processing a request. Concurrent invocations are not supported.
+2026-02-01 23:03:54,018 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690860
+2026-02-01 23:03:58,638 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #690776: Quality=9, Automation=10
+2026-02-01 23:03:58,638 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690776
+2026-02-01 23:03:58,638 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #690776 to ClickHouse
+2026-02-01 23:03:58,648 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-02-01 23:03:58,649 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-02-01 23:03:58,649 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-02-01 23:03:58,649 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+2026-02-01 23:03:58,649 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-02-01 23:03:58,649 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #690776: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-02-01 23:04:42,209 - ai_evaluator.main - INFO - Received evaluation request for issue #690885 from evaluator
+2026-02-01 23:04:42,209 - ai_evaluator.evaluator - INFO - Starting evaluation for issue #690885
+2026-02-01 23:04:42,209 - ai_evaluator.evaluator - INFO - Calling Bedrock model us.amazon.nova-pro-v1:0 for evaluation
+2026-02-01 23:04:57,666 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:04:57,668 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:04:57,670 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:04:57,672 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp/ "HTTP/1.1 307 Temporary Redirect"
+2026-02-01 23:04:57,677 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:04:57,683 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:04:57,685 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:04:58,015 - httpx - INFO - HTTP Request: POST http://172.31.33.44:8000/mcp "HTTP/1.1 200 OK"
+2026-02-01 23:05:26,343 - ai_evaluator.evaluator - INFO - Evaluation complete for issue #690885: Quality=8, Automation=6
+2026-02-01 23:05:26,343 - ai_evaluator.evaluator - INFO - Stored evaluation for issue #690885
+2026-02-01 23:05:26,343 - ai_evaluator.clickhouse_client - INFO - Attempting to store evaluation for issue #690885 to ClickHouse
+2026-02-01 23:05:26,352 - httpx - INFO - HTTP Request: POST http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod "HTTP/1.1 500 Internal Server Error"
+2026-02-01 23:05:26,354 - ai_evaluator.clickhouse_client - ERROR - ClickHouse query failed: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+2026-02-01 23:05:26,354 - ai_evaluator.clickhouse_client - ERROR - Request URL: http://172.31.159.42:8123/, User: mnoc_prod_collector, Database: mnoc_prod
+2026-02-01 23:05:26,354 - ai_evaluator.clickhouse_client - ERROR - Response status: 500
+2026-02-01 23:05:26,354 - ai_evaluator.clickhouse_client - ERROR - Response body: Code: 497. DB::Exception: mnoc_prod_collector: Not enough privileges. To execute this query, it's necessary to havethe grant SELECT(evaluated_at, project_identifier, issue_type, solution_quality, adherence_to_solution, operator_effort, automation_potential, resolution_efficiency, overall_score, automation_candidate, requires_attention, resolution_time_seconds) ON mnoc_prod.ai_evaluations. (ACCESS_DENIED) (version 25.4.5.24 (official build))
+
+2026-02-01 23:05:26,354 - ai_evaluator.clickhouse_client - ERROR - Failed to store evaluation for issue #690885: Server error '500 Internal Server Error' for url 'http://172.31.159.42:8123/?user=mnoc_prod_collector&password=Ung1booqu2Eo9ooT&database=mnoc_prod'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+INFO:     172.31.33.44:39200 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:39206 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:39220 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:57174 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:57182 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:57186 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:57202 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:57210 - "POST /evaluate HTTP/1.1" 200 OK
+INFO:     172.31.33.44:57216 - "POST /evaluate HTTP/1.1" 200 OK
+{
+    "issue_id": 690776,
+    "evaluated_at": "2026-02-01T23:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 9,
+        "adherence_to_solution": 10,
+        "operator_effort": 10,
+        "automation_potential": 10,
+        "resolution_efficiency": 10
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, correctly identifying the issueINFO:     172.31.33.44:47460 - "POST /evaluate HTTP/1.1" 200 OK
+ as a transient network disruption. It leveraged historical knowledge effectively, noting the common pattern of automatic resolution.",
+        "adherence_to_solution_notes": "The operator followed the AI's recommendation precisely, as the issue resolved itself automatically within the expected time frame.",
+        "operator_effort_notes": "Minimal effort was required from the operator, as the issue resolved automatically without any manual intervention.",
+        "automation_recommendations": "This issue demonstrates high potential for automation, as it has consistently resolved itself automatically. Further automation could involve setting up alerts for similar patterns and automating the resolution process.",
+        "efficiency_notes": "The resolution was highly efficient, with the issue clearing automatically within 2 minutes, which is optimal given the nature of the problem."
+    },
+    "summary": "The resolution process for this issue was highly efficient and required minimal operator effort. The AI's recommendation was accurate and relevant, and the issue resolved itself automatically. The most impactful automation opportunity would be to further automate the detection and resolution of similar transient network disruptions.",
+    "improvement_priority": "low"
+<thinking> To provide a comprehensive evaluation, I need to gather detailed information about the issue, its resolution, and the context around it. I will start by fetching the AI analysis and resolution notes from the Redmine issue. Then, I will use the get_knowledge_tool to retrieve historical knowledge about the issue class. Additionally, I will search for correlated alerts in Zabbix to understand the context better. </thinking>
+Tool #25: get_redmine_issue
+
+Tool #26: get_knowledge_tool
+
+Tool #27: search_knowledge_base
+
+Tool #28: search_redmine_issues
+{
+    "issue_id": 690885,
+    "evaluated_at": "2026-02-01T23:00:00",
+    "model": "Resolution Quality Evaluation Model",
+    "metrics": {
+        "solution_quality": 8,
+        "adherence_to_solution": 9,
+        "operator_effort": 7,
+        "automation_potential": 6,
+        "resolution_efficiency": 8
+    },
+    "analysis": {
+        "solution_quality_notes": "The AI's original recommendation was accurate and relevant, identifying the issue as an isolated, intermittent authentication failure. It effectively leveraged historical knowledge to suggest appropriate actions.",
+        "adherence_to_solution_notes": "The operator followed the AI's recommendation closely, verifying the legitimacy of the access attempt and resolving the issue manually within the expected timeframe.",
+        "operator_effort_notes": "The operator needed to investigate the legitimacy of the access attempt and manually clear the alarm, indicating moderate effort.",
+        "automation_potential_notes": "While the issue could be partially automated (e.g., auto-clearing upon successful login), full automation is challenging due to the need for human judgment inassessing access attempts.",
+        "resolution_efficiency_notes": "The issue was resolved efficiently within 4 minutes, aligning with historical resolution times. However, there is room for improvement in reducing operator effort through partial automation."
+    },
+    "summary": "The resolution process demonstrated good adherence to the AI's recommendations and efficient use of time. The main area for improvement lies in partially automating the resolution to reduce operator effort. The most impactful automation opportunity would be to implement an auto-clear mechanism upon successful login.",
+    "improvement_priority": "medium"
