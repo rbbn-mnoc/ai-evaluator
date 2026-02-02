@@ -44,10 +44,10 @@ def fetch_issue_from_mcp(issue_id: int) -> dict:
         
         result = asyncio.run(fetch())
         
-        # Parse the MCP response
-        if result and hasattr(result, 'content') and len(result.content) > 0:
+        # Parse the MCP response (dict format)
+        if result and isinstance(result, dict) and 'content' in result and len(result['content']) > 0:
             import json
-            text_content = result.content[0].text
+            text_content = result['content'][0]['text']
             if isinstance(text_content, str):
                 issue_data = json.loads(text_content)
             else:
