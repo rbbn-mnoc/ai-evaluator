@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-"""Test script to trigger manual evaluation for a Redmine issue."""
+"""
+Test script to trigger manual evaluation for a Redmine issue.
+Usage:
+  docker exec ai-evaluator python /app/test_evaluation.py 691332
+  docker exec ai-evaluator python /app/test_evaluation.py 691332 --api-key YOUR_API_KEY
+"""
 
 import os
 import sys
+import argparse
 import requests
 from datetime import datetime
 
 
-def fetch_issue_from_redmine(issue_id: int) -> dict:
+def fetch_issue_from_redmine(issue_id: int, api_key: str) -> dict:
     """Fetch issue data from Redmine API."""
     redmine_url = os.getenv("REDMINE_URL", "https://redmine.ribbonmaas.net")
-    api_key = os.getenv("REDMINE_API_KEY", "")
-    
-    if not api_key:
-        print("❌ Error: REDMINE_API_KEY environment variable not set")
-        sys.exit(1)
     
     url = f"{redmine_url}/issues/{issue_id}.json"
     headers = {"X-Redmine-API-Key": api_key}
@@ -66,13 +67,13 @@ def build_evaluation_request(issue_data: dict) -> dict:
     }
 
 
-def trigger_evaluation(issue_id: int, evaluator_url: str = "http://localhost:8002/evaluate"):
+def trigger_evaluation(issue_id: int, api_key: str, evaluator_url: str = "http://localhost:8002/evaluate"):
     """Trigger evaluation for a specific issue."""
     username = os.getenv("SERVICE_USERNAME", "evaluator")
     password = os.getenv("SERVICE_PASSWORD", "changeme")
     
     # Fetch issue from Redmine
-    issue_data = fetch_issue_from_redmine(issue_id)
+    issue_data = fetch_issue_from_redmine(issue_id, api_key)
     
     # Build evaluation request
     request_payload = build_evaluation_request(issue_data)
@@ -128,13 +129,38 @@ def trigger_evaluation(issue_id: int, evaluator_url: str = "http://localhost:800
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python test_evaluation.py <issue_id> [evaluator_url]")
-        print("Example: python test_evaluation.py 691332")
-        print("Example: python test_evaluation.py 691332 http://localhost:8002/evaluate")
+    parser = argparse.ArgumentParser(
+        description="Trigger manual evaluation for a Redmine issue",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Using environment variable REDMINE_API_KEY
+  python test_evaluation.py 691332
+  
+  # Using command line API key
+  python test_evaluation.py 691332 --api-key YOUR_API_KEY
+  
+  # With custom evaluator URL
+  python test_evaluation.py 691332 --api-key YOUR_API_KEY --url http://localhost:8002/evaluate
+        """
+    )
+    
+    parser.add_argument("issue_id", type=int, help="Redmine issue ID to evaluate")
+    parser.add_argument("--api-key", "-k", help="Redmine API key (overrides REDMINE_API_KEY env var)")
+    parser.add_argument("--url", "-u", default="http://localhost:8002/evaluate", 
+                        help="Evaluator service URL (default: http://localhost:8002/evaluate)")
+    
+    args = parser.parse_args()
+    
+    # Get API key from command line or environment variable
+    api_key = args.api_key or os.getenv("REDMINE_API_KEY", "")
+    
+    if not api_key:
+        print("❌ Error: REDMINE_API_KEY not provided")
+        print("   Either set REDMINE_API_KEY environment variable or use --api-key parameter")
+        print("\nExamples:")
+        print("  python test_evaluation.py 691332 --api-key YOUR_API_KEY")
+        print("  export REDMINE_API_KEY=YOUR_API_KEY && python test_evaluation.py 691332")
         sys.exit(1)
     
-    issue_id = int(sys.argv[1])
-    evaluator_url = sys.argv[2] if len(sys.argv) > 2 else "http://localhost:8002/evaluate"
-    
-    trigger_evaluation(issue_id, evaluator_url)
+    trigger_evaluation(args.issue_id, api_key, args.url)
