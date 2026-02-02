@@ -3,7 +3,6 @@
 Test script to trigger manual evaluation for a Redmine issue.
 Usage:
   docker exec ai-evaluator python /app/test_evaluation.py 691332
-  docker exec ai-evaluator python /app/test_evaluation.py 691332 --api-key YOUR_API_KEY
 """
 
 import os
@@ -13,26 +12,44 @@ import requests
 from datetime import datetime
 
 
-def fetch_issue_from_redmine(issue_id: int, api_key: str) -> dict:
-    """Fetch issue data from Redmine API."""
-    redmine_url = os.getenv("REDMINE_URL", "https://redmine.ribbonmaas.net")
+def fetch_issue_from_mcp(issue_id: int) -> dict:
+    """Fetch issue data from MCP server."""
+    mcp_base_url = os.getenv("MCP_BASE_URL", "http://localhost:8000/mcp/")
+    mcp_api_key = os.getenv("MCP_API_KEY", "")
     
-    url = f"{redmine_url}/issues/{issue_id}.json"
-    headers = {"X-Redmine-API-Key": api_key}
+    if not mcp_api_key:
+        print("❌ Error: MCP_API_KEY environment variable not set")
+        sys.exit(1)
     
-    print(f"🔍 Fetching issue #{issue_id} from Redmine...")
+    # Use MCP redmine_getIssue tool to fetch issue
+    url = f"{mcp_base_url.rstrip('/')}/tools/redmine_getIssue"
+    headers = {
+        "Authorization": f"Bearer {mcp_api_key}",
+        "Content-Type": "application/json"
+    }
+    payload = {"issue_id": issue_id}
+    
+    print(f"🔍 Fetching issue #{issue_id} from MCP server...")
     
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
         response.raise_for_status()
         
-        issue_data = response.json()["issue"]
-        print(f"✓ Found issue: {issue_data['subject'][:60]}...")
+        result = response.json()
+        issue_data = result.get("content", [])[0].get("text", {})
+        
+        if isinstance(issue_data, str):
+            import json
+            issue_data = json.loads(issue_data)
+        
+        print(f"✓ Found issue: {issue_data.get('subject', 'Unknown')[:60]}...")
         
         return issue_data
     
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error fetching issue from Redmine: {e}")
+        print(f"❌ Error fetching issue from MCP: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"   Response: {e.response.text[:200]}")
         sys.exit(1)
 
 
