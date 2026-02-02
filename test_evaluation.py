@@ -67,13 +67,13 @@ def build_evaluation_request(issue_data: dict) -> dict:
     }
 
 
-def trigger_evaluation(issue_id: int, api_key: str, evaluator_url: str = "http://localhost:8002/evaluate"):
+def trigger_evaluation(issue_id: int, evaluator_url: str = "http://localhost:8002/evaluate"):
     """Trigger evaluation for a specific issue."""
     username = os.getenv("SERVICE_USERNAME", "evaluator")
     password = os.getenv("SERVICE_PASSWORD", "changeme")
     
-    # Fetch issue from Redmine
-    issue_data = fetch_issue_from_redmine(issue_id, api_key)
+    # Fetch issue from MCP server
+    issue_data = fetch_issue_from_mcp(issue_id)
     
     # Build evaluation request
     request_payload = build_evaluation_request(issue_data)
@@ -134,33 +134,18 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Using environment variable REDMINE_API_KEY
+  # Trigger evaluation for issue
   python test_evaluation.py 691332
   
-  # Using command line API key
-  python test_evaluation.py 691332 --api-key YOUR_API_KEY
-  
   # With custom evaluator URL
-  python test_evaluation.py 691332 --api-key YOUR_API_KEY --url http://localhost:8002/evaluate
+  python test_evaluation.py 691332 --url http://localhost:8002/evaluate
         """
     )
     
     parser.add_argument("issue_id", type=int, help="Redmine issue ID to evaluate")
-    parser.add_argument("--api-key", "-k", help="Redmine API key (overrides REDMINE_API_KEY env var)")
     parser.add_argument("--url", "-u", default="http://localhost:8002/evaluate", 
                         help="Evaluator service URL (default: http://localhost:8002/evaluate)")
     
     args = parser.parse_args()
     
-    # Get API key from command line or environment variable
-    api_key = args.api_key or os.getenv("REDMINE_API_KEY", "")
-    
-    if not api_key:
-        print("❌ Error: REDMINE_API_KEY not provided")
-        print("   Either set REDMINE_API_KEY environment variable or use --api-key parameter")
-        print("\nExamples:")
-        print("  python test_evaluation.py 691332 --api-key YOUR_API_KEY")
-        print("  export REDMINE_API_KEY=YOUR_API_KEY && python test_evaluation.py 691332")
-        sys.exit(1)
-    
-    trigger_evaluation(args.issue_id, api_key, args.url)
+    trigger_evaluation(args.issue_id, args.url)
