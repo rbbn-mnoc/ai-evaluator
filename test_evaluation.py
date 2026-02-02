@@ -27,22 +27,25 @@ def fetch_issue_from_mcp(issue_id: int) -> dict:
         # Import MCP client (same as ai-evaluator uses)
         from ai_evaluator.mcp_client import MCPClient
         import asyncio
+        import uuid
         
         # Create and start MCP client
         mcp_client = MCPClient(base_url=mcp_base_url, api_key=mcp_api_key)
         mcp_client.start()
         
-        # Call get_redmine_issue tool
+        # Call get_redmine_issue tool (using same signature as ai-agents)
         async def fetch():
+            tool_use_id = f"test-{issue_id}-{uuid.uuid4().hex[:8]}"
             return await mcp_client._client.call_tool_async(
-                "get_redmine_issue",
-                {"issue_id": issue_id, "include_journals": True, "include_attachments": False}
+                tool_use_id=tool_use_id,
+                name="get_redmine_issue",
+                arguments={"issue_id": issue_id, "include_journals": True, "include_attachments": False}
             )
         
         result = asyncio.run(fetch())
         
         # Parse the MCP response
-        if result and len(result.content) > 0:
+        if result and hasattr(result, 'content') and len(result.content) > 0:
             import json
             text_content = result.content[0].text
             if isinstance(text_content, str):
@@ -55,6 +58,8 @@ def fetch_issue_from_mcp(issue_id: int) -> dict:
             return issue_data
         else:
             print(f"❌ Error: No data returned from MCP server")
+            print(f"   Result type: {type(result)}")
+            print(f"   Result: {result}")
             mcp_client.close()
             sys.exit(1)
     
