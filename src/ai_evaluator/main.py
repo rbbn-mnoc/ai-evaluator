@@ -3,6 +3,7 @@
 import os
 import asyncio
 import logging
+from datetime import datetime
 from contextlib import asynccontextmanager
 from asyncio import Queue
 from dotenv import load_dotenv
@@ -97,8 +98,14 @@ class EvaluationQueue:
                     evaluation = await self._evaluate_with_retry(issue_data)
                     future.set_result(evaluation)
                 except Exception as e:
-                    logger.error(f"Evaluation failed for issue #{issue_data.get('issue_id')}: {e}")
-                    future.set_exception(e)
+                    logger.error(f"Evaluation failed for issue #{issue_data.get('issue_id')} after retries: {e}")
+                    # Return error result instead of exception to prevent request failure
+                    error_result = {
+                        "issue_id": issue_data.get("issue_id"),
+                        "error": str(e),
+                        "evaluated_at": datetime.utcnow().isoformat()
+                    }
+                    future.set_result(error_result)
                 finally:
                     self.queue.task_done()
                     

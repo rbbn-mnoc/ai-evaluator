@@ -102,11 +102,8 @@ class EvaluationAgent:
             
         except Exception as e:
             logger.error(f"Evaluation failed for issue #{issue_id}: {e}")
-            return {
-                "issue_id": issue_id,
-                "error": str(e),
-                "evaluated_at": datetime.utcnow().isoformat()
-            }
+            # Re-raise the exception so retry logic can handle it
+            raise
     
     def _parse_evaluation(self, agent_result) -> dict:
         """
