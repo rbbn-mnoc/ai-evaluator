@@ -13,7 +13,7 @@ from datetime import datetime
 
 
 def fetch_issue_from_mcp(issue_id: int) -> dict:
-    """Fetch issue data from MCP server."""
+    """Fetch issue data from MCP server using Strands MCP client."""
     mcp_base_url = os.getenv("MCP_BASE_URL", "http://localhost:8000/mcp/")
     mcp_api_key = os.getenv("MCP_API_KEY", "")
     
@@ -21,35 +21,47 @@ def fetch_issue_from_mcp(issue_id: int) -> dict:
         print("❌ Error: MCP_API_KEY environment variable not set")
         sys.exit(1)
     
-    # Use MCP redmine_getIssue tool to fetch issue
-    url = f"{mcp_base_url.rstrip('/')}/tools/redmine_getIssue"
-    headers = {
-        "Authorization": f"Bearer {mcp_api_key}",
-        "Content-Type": "application/json"
-    }
-    payload = {"issue_id": issue_id}
-    
     print(f"🔍 Fetching issue #{issue_id} from MCP server...")
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        response.raise_for_status()
+        # Import MCP client (same as ai-evaluator uses)
+        from ai_evaluator.mcp_client import MCPClient
+        import asyncio
         
-        result = response.json()
-        issue_data = result.get("content", [])[0].get("text", {})
+        # Create and start MCP client
+        mcp_client = MCPClient(base_url=mcp_base_url, api_key=mcp_api_key)
+        mcp_client.start()
         
-        if isinstance(issue_data, str):
+        # Call get_redmine_issue tool
+        async def fetch():
+            return await mcp_client._client.call_tool_async(
+                "get_redmine_issue",
+                {"issue_id": issue_id, "include_journals": True, "include_attachments": False}
+            )
+        
+        result = asyncio.run(fetch())
+        
+        # Parse the MCP response
+        if result and len(result.content) > 0:
             import json
-            issue_data = json.loads(issue_data)
-        
-        print(f"✓ Found issue: {issue_data.get('subject', 'Unknown')[:60]}...")
-        
-        return issue_data
+            text_content = result.content[0].text
+            if isinstance(text_content, str):
+                issue_data = json.loads(text_content)
+            else:
+                issue_data = text_content
+                
+            print(f"✓ Found issue: {issue_data.get('subject', 'Unknown')[:60]}...")
+            mcp_client.close()
+            return issue_data
+        else:
+            print(f"❌ Error: No data returned from MCP server")
+            mcp_client.close()
+            sys.exit(1)
     
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         print(f"❌ Error fetching issue from MCP: {e}")
-        if hasattr(e, 'response') and e.response is not None:
-            print(f"   Response: {e.response.text[:200]}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
